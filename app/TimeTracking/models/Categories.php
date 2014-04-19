@@ -8,7 +8,7 @@
 
 namespace TimeTracking\models;
 
-use User;
+use Eloquent, Validaton, Exception;
 class Categories extends Eloquent {
 
     private $table = 'time_tracking_categories_table';
