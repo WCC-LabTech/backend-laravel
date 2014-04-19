@@ -30,6 +30,18 @@ class TimeTrackingCategoriesController extends BaseController{
 
     }
 
+    public public function postDeleteCategory(){
+        
+        $input = Input::all();
+        $category = Categories::find($input['id']);
+        try {
+             category->delete();
+             Response::json('Message',200);
+        } catch (exception $e) {
+                 Response::json('Message', $e , 404);
+        }
+    }
+
     public function postEditCategory(){
 
         $input = Input::all();
@@ -39,7 +51,7 @@ class TimeTrackingCategoriesController extends BaseController{
             $category->save();
             Response::json('Message','category updated' , 200);
         }catch (exception $e){
-            Response::json('Message' ,$e,404);
+            Response::json('Message' , $e , 404);
         }
 
     }

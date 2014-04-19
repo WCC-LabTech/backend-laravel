@@ -16,9 +16,6 @@ class TimeTrackingPayPeriod extends Eloquent{
     private $fillable = array('start_pay_period','end_pay_period');
     private $timestamps = false;
 
-
-    
-
     public function getPeriod(){
         return $this->select(array('start_pay_period','end_pay_period'));
     }

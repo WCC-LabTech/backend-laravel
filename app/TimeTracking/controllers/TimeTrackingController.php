@@ -21,7 +21,7 @@ class TimeTrackingController extends  BaseController{
         $input = Input::all();
 
         if($this->validateTime(Input::get('start_time')) && $this->validateTime(Input::get('end_time')) ){
-            $this->postAddTime($timeEntry);
+            $this->postAddTime($timeEntry,$input);
             try{
                 $timeEntry->save();
                 Response::json('Message','Time saved');
@@ -47,12 +47,13 @@ class TimeTrackingController extends  BaseController{
 
     }
 
+    
     public function postModifyTime(){
 
-        $timeEntry = TimeTrackingEntry::findOrFail('id')->get();
+        $timeEntry = TimeTrackingEntry::find('id')->get();
 
         if($this->validateTime(Input::get('start_time')) && $this->validateTime(Input::get('end_time')) ){
-            $this->postAddTime($timeEntry);
+            $this->postAddTime($timeEntry, Input::all() );
             try{
                 $timeEntry->save();
                 Response::json('Message','Time saved');
@@ -62,19 +63,29 @@ class TimeTrackingController extends  BaseController{
         }
 
     }
+    
+    public function getPayDates(){
+
+    $entry = DB::$table('time_tracking_entry')->where('pay_id' , ' = ' , Input::get('pay_id') )
+    ->select( 'start_time' , 'end_time' , 'start_date' , 'end_date');
+
+    return $entry; 
+
+    }
 
     public function missingMethod($parameters = array()){
         return Response::json(array('status' => 404, 'message' => 'Not found'), 404);
     }
 
-    private function postAddTime($timeEntry){
+    private function postAddTime($timeEntry, $input){
 
-        $timeEntry->category_id = Input::get('category_id');
-        $timeEntry->startTime = Input::get('start_time');
-        $timeEntry->startDate = Input::get('start_date');
-        $timeEntry->endDate = Input::get('end_date');
-        $timeEntry->endTime   = Input::get('end_time');
-        $timeEntry->description = Input::get('description');
+        $timeEntry->category_id = $input['category_id'];
+        $timeEntry->pay_id      = $input['pay_id'];
+        $timeEntry->startTime = $input['start_time'];
+        $timeEntry->startDate = $input['start_date'];
+        $timeEntry->endDate = $input['end_date'];
+        $timeEntry->endTime   = $input['end_time'];
+        $timeEntry->description = $input['description'];
 
     }
     /**
