@@ -13,7 +13,11 @@ use TimeTracking\models\Categories;
 use TimeTracking\models\TimeTrackingEntry;
 
 class TimeTrackingController extends  BaseController{
-
+    
+    /**
+    * This function will allow the user to create a time entry 
+    * in the database . 
+    */
     public function postCreateTime(){
 
         $timeEntry = new TimeTrackingEntry();
@@ -32,7 +36,10 @@ class TimeTrackingController extends  BaseController{
         }
 
     }
-    
+    /**
+    * This function will eventually take over the modify time and 
+    * create time functions.   
+    */
     public function postCreateTimeOrModify(){
 
         $userTime = TimeTrackingEntry::where('id' , ' = ' , Input::get('id'))->count();
@@ -57,7 +64,10 @@ class TimeTrackingController extends  BaseController{
 
 
     }
-
+    /**
+    * This function will delete a time entry for the user 
+    *
+    */
     public function postDeleteTime(){
 
         $timeEntry = TimeTrackingEntry::find('id');
@@ -70,7 +80,11 @@ class TimeTrackingController extends  BaseController{
         }
 
     }
-
+    /**
+    * This function will allow the user to modify there time through
+    * the pay period . For the reason of mistakes.  
+    *
+    */
     public function postModifyTime(){
 
         $timeEntry = TimeTrackingEntry::find('id')->get();
@@ -85,7 +99,11 @@ class TimeTrackingController extends  BaseController{
                 Response::json('Message',$e);
             }
     }
-    
+    /**
+    * This function will retreive the current pay period and return the 
+    * dates worked for the user to see .  
+    * @return $payperiod for the user  
+    */
     public function getPayDates(){
 
     $entry = DB::$table('time_tracking_entry')->where('pay_id' , ' = ' , Input::get('pay_id') )
@@ -94,11 +112,20 @@ class TimeTrackingController extends  BaseController{
     return $entry; 
 
     }
-
+    /**
+    * The standard miss method function .
+    * @return the response of the missig method .
+    */
     public function missingMethod($parameters = array()){
         return Response::json(array('status' => 404, 'message' => 'Not found'), 404);
     }
-
+    /**
+    * This is a helper function to provide flexablity through out the class
+    * This function will validate the time and then add the time to the 
+    * data base 
+    * @param $timeEntry the object to add all the fields to the database
+    * @param $input the input to transfer to the @link{#$timeEntry }
+    */
     private function postAddTime($timeEntry, $input){
             
         if($this->validateTime(Input::get('start_time')) 
