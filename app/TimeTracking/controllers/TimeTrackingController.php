@@ -20,15 +20,41 @@ class TimeTrackingController extends  BaseController{
         $timeEntry->user_id = Auth::user()->id;
         $input = Input::all();
 
-        if($this->validateTime(Input::get('start_time')) && $this->validateTime(Input::get('end_time')) ){
-            $this->postAddTime($timeEntry,$input);
-            try{
-                $timeEntry->save();
-                Response::json('Message','Time saved');
-            }catch (exception $e){
-                Response::json('Message',$e);
-            }
+        $this->postAddTime($timeEntry,$input);
+        
+        try{
+            
+            $timeEntry->save();
+            Response::json('Message', 200);
+            
+        }catch (exception $e){
+                Response::json('Message',$e, 400 );
         }
+
+    }
+    
+    public function postCreateTimeOrModify(){
+
+        $userTime = TimeTrackingEntry::where('id' , ' = ' , Input::get('id'))->count();
+
+        if ($userTime != 0) {
+            $this->postAddTime($userTime = new TimeTrackingEntry(), Input::all());
+            try{
+
+                $userTime->save();
+                Response::json('Message', 200);
+
+            }catch(exception $e){
+                  Response::json('Message',400);  
+            }
+
+        }
+        else{
+            
+            $timeEntry = TimeTrackingEntry::find('id')->get();
+            $this->postAddTime($timeEntry, Input::all() );
+        }
+
 
     }
 
@@ -43,25 +69,21 @@ class TimeTrackingController extends  BaseController{
             return Response::json('Message' , $e);
         }
 
-
-
     }
 
-    
     public function postModifyTime(){
 
         $timeEntry = TimeTrackingEntry::find('id')->get();
-
-        if($this->validateTime(Input::get('start_time')) && $this->validateTime(Input::get('end_time')) ){
-            $this->postAddTime($timeEntry, Input::all() );
-            try{
-                $timeEntry->save();
-                Response::json('Message','Time saved');
+        $this->postAddTime($timeEntry, Input::all() );
+        
+        try{
+            
+            $timeEntry->save();
+            Response::json('Message','Time saved');
+            
             }catch (exception $e){
                 Response::json('Message',$e);
             }
-        }
-
     }
     
     public function getPayDates(){
@@ -78,15 +100,19 @@ class TimeTrackingController extends  BaseController{
     }
 
     private function postAddTime($timeEntry, $input){
-
-        $timeEntry->category_id = $input['category_id'];
-        $timeEntry->pay_id      = $input['pay_id'];
-        $timeEntry->startTime = $input['start_time'];
-        $timeEntry->startDate = $input['start_date'];
-        $timeEntry->endDate = $input['end_date'];
-        $timeEntry->endTime   = $input['end_time'];
-        $timeEntry->description = $input['description'];
-
+            
+        if($this->validateTime(Input::get('start_time')) 
+            && $this->validateTime(Input::get('end_time')) ){
+            
+            $timeEntry->category_id = $input['category_id'];
+            $timeEntry->pay_id      = $input['pay_id'];
+            $timeEntry->startTime = $input['start_time'];
+            $timeEntry->startDate = $input['start_date'];
+            $timeEntry->endDate = $input['end_date'];
+            $timeEntry->endTime   = $input['end_time'];
+            $timeEntry->description = $input['description'];
+         
+         }
     }
     /**
      * This is a simple time validation to make sure the time is
@@ -105,12 +131,7 @@ class TimeTrackingController extends  BaseController{
         if($hours <= 12 && $minutes < 60 && $seconds < 60)
             return (($hours > 0 &&  $minutes >= 0 && $seconds >= 0));
 
-    return false; // Time wasn't valid..
+    return false; 
 
     }
-
-
-
-
-
 }
