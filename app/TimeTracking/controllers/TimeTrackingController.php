@@ -18,24 +18,16 @@ class TimeTrackingController extends  BaseController{
     * This function will allow the user to create a time entry 
     * in the database . 
     */
-    public function postCreateTime(){
+    public function postCreateTime()
+    {
 
         $timeEntry = new TimeTrackingEntry();
         $timeEntry->user_id = Auth::user()->id;
         $input = Input::all();
 
         $this->postAddTime($timeEntry,$input);
-        
-        try{
-            
-            $timeEntry->save();
-            Response::json('Message', 200);
-            
-        }catch (exception $e){
-                Response::json('Message',$e, 400 );
-        }
-
     }
+    
     /**
     * This function will eventually take over the modify time and 
     * create time functions.   
@@ -44,34 +36,28 @@ class TimeTrackingController extends  BaseController{
 
         $userTime = TimeTrackingEntry::where('id' , ' = ' , Input::get('id'))->count();
 
-        if ($userTime != 0) {
+        if ($userTime != 0) 
+        {
             $this->postAddTime($userTime = new TimeTrackingEntry(), Input::all());
-            try{
-
-                $userTime->save();
-                Response::json('Message', 200);
-
-            }catch(exception $e){
-                  Response::json('Message',400);  
-            }
-
         }
-        else{
-            
+        else
+        {    
             $timeEntry = TimeTrackingEntry::find('id')->get();
             $this->postAddTime($timeEntry, Input::all() );
         }
 
 
     }
+    
     /**
     * This function will delete a time entry for the user 
     *
     */
-    public function postDeleteTime(){
+    public function postDeleteTime()
+    {
 
         $timeEntry = TimeTrackingEntry::find('id');
-
+        
         try{
             $timeEntry->delete();
             Response::json('Message', 'deleted');
@@ -80,38 +66,33 @@ class TimeTrackingController extends  BaseController{
         }
 
     }
+    
     /**
     * This function will allow the user to modify there time through
     * the pay period . For the reason of mistakes.  
     *
     */
-    public function postModifyTime(){
+    public function postModifyTime()
+    {
 
         $timeEntry = TimeTrackingEntry::find('id')->get();
         $this->postAddTime($timeEntry, Input::all() );
-        
-        try{
-            
-            $timeEntry->save();
-            Response::json('Message','Time saved');
-            
-            }catch (exception $e){
-                Response::json('Message',$e);
-            }
     }
     /**
     * This function will retreive the current pay period and return the 
     * dates worked for the user to see .  
     * @return $payperiod for the user  
     */
-    public function getPayDates(){
+    public function getPayDates()
+    {
 
-    $entry = DB::$table('time_tracking_entry')->where('pay_id' , ' = ' , Input::get('pay_id') )
-    ->select( 'start_time' , 'end_time' , 'start_date' , 'end_date');
+    $entry = TimeTrackingEntry::where('pay_id' , ' = ' , Input::get('pay_id') )
+    ->select( 'start_time' , 'end_time' , 'start_date' , 'end_date')->get();
 
     return $entry; 
 
     }
+    
     /**
     * The standard miss method function .
     * @return the response of the missig method .
@@ -119,6 +100,7 @@ class TimeTrackingController extends  BaseController{
     public function missingMethod($parameters = array()){
         return Response::json(array('status' => 404, 'message' => 'Not found'), 404);
     }
+    
     /**
     * This is a helper function to provide flexablity through out the class
     * This function will validate the time and then add the time to the 
@@ -138,6 +120,16 @@ class TimeTrackingController extends  BaseController{
             $timeEntry->endDate = $input['end_date'];
             $timeEntry->endTime   = $input['end_time'];
             $timeEntry->description = $input['description'];
+            
+            try{
+
+                $timeEntry->save();
+                Response::json(array('status' => 201, 'message' => 'time saved' ), 201);
+
+            }catch(exception $e){
+                  Response::json(array( 'status' => , 401 
+                    , 'message ' => 'Time Saved Failed ' , 'error ' => $e) ,400);  
+            }
          
          }
     }
