@@ -88,8 +88,12 @@ function Duration($startTime, $endTime) {
         <div class="form-group">
         	<label for="end_time">End Time</label>
         	<input type="test" id="end_time" class="form-control" name="end_time" />
+        </div> 
+       <div class="form-group">
+        	<label for="clock_in">Clocked In</label>
+        	<input type="checkbox" id="clock_in" class="form-control" name="clock_in" value="yes" checked />
         </div>
-        <div class="form-group">
+       <div class="form-group">
         	<label for="description">Comments</label>
         	<textarea class="form-control" name="description"></textarea>
         </div>
@@ -139,6 +143,10 @@ function Duration($startTime, $endTime) {
         <div class="form-group">
         	<label for="modify_end_time">End Time</label>
         	<input type="test" id="modify_end_time" class="form-control" name="modify_end_time" />
+        </div>
+       <div class="form-group">
+        	<label for="modify_clock_in">Clocked In</label>
+        	<input type="checkbox" id="modify_clock_in" class="form-control" name="modify_clock_in" value="yes" checked />
         </div>
         <div class="form-group">
         	<label for="description">Comments</label>

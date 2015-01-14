@@ -12,15 +12,19 @@
 		<table class="table table-striped">
 			<thead>
 				<tr>
+					<th>ID</th>
 					<th>Start Date</th>
 					<th>End Date</th>
+					<th>Options</th>
 				</tr>
 			</thead>
 			<tbody>
 				<?php foreach ($pay_periods as $period) { ?>
 				<tr>
-					<td><a href="#" style="display:block;"><?php echo $period->start_pay_period; ?></a></td>
-					<td><a href="#" style="display:block;"><?php echo $period->end_pay_period; ?></a></td>
+					<td><?php echo $period->id; ?></td>
+					<td><?php echo $period->start_pay_period; ?></td>
+					<td><?php echo $period->end_pay_period; ?></td>
+					<td><a href="<?php echo URL::to('admin/time/viewpay/' . $period->id); ?>" class="btn btn-success">View</a>
 				</tr>
 				<?php } ?>
 			</tbody>

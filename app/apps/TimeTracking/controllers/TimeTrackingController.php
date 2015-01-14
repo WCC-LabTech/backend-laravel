@@ -41,29 +41,15 @@ class TimeTrackingController extends  BaseController{
         $timeEntry = new TimeTrackingEntry();
         $timeEntry->user_id = Auth::user()->id;
         $input = Input::all();
-
         
             $this->postAddTime($timeEntry);
             try{
                 $timeEntry->save();
-               //return  Response::json(array('status' => 200, 'message' => 'time was saved '),200 );
                 return Redirect::back()->with('message', 'Time Entry Created')->with('alert', 'success');
             }catch (exception $e){
-                //return Response::json(array('status' => 401, 'message' => 'time was not saved', 'error' => $e), 401);
                 return Redirect::back()->with('message', 'Time Entry Creation Failed')->with('alert', 'danger');
             }
-    
-
     }
-    /*
-    Alternet version for adding time.
-    public function postCreateTime(){
-
-        if(Auth::validate(Input::get('id')) ){
-            TimeTrackingEntry::create(Input::all());
-        }
-    }
-    */
     /**
     * This function will allow the user to retrieve a time based 
     * on the id . This function calls find() which is inherited from  
@@ -74,17 +60,16 @@ class TimeTrackingController extends  BaseController{
 
         $timeEntry = TimeTrackingEntry::find($id);
 
-        try{
-            $timeEntry->delete();
-            //return Response::json(array('status' => 201, 'message' => 'time was deleted '),200 );
-            return Redirect::back()->with('message', 'Entry Deleted')->with('alert', 'success');
-        }catch (exception $e){
-            //return Response::json(array( 'status' => 401, 'message' => 'time was not saved' , 'error' => $e), 401);
-            return Redirect::back()->with('message', 'Entry Deletion Failed')->with('alert', 'danger');
+        if ($timeEntry['user_id'] != Auth::user()->id) {
+          return Response::json(array('status' => 401, 'message' => 'You can only delete your own Entrys'), 401);
         }
 
-
-
+        try{
+            $timeEntry->delete();
+            return Redirect::back()->with('message', 'Entry Deleted')->with('alert', 'success');
+        }catch (exception $e){
+            return Redirect::back()->with('message', 'Entry Deletion Failed')->with('alert', 'danger');
+        }
     }
     /**
     *
@@ -100,25 +85,37 @@ class TimeTrackingController extends  BaseController{
     * the validate time if statement was returning false as well even on good data, which lead to the odd situation where 
     * this call was not returning content leading to an error, so removed it for the time
     * also changed the responces to redirect so you would be back on the same page you started
-    * TO DO: check auth, validate time
+    * TO DO: validate time
     */
     public function postModifyTime(){
 
         $timeEntry = TimeTrackingEntry::find(Input::get('id'));  //OrFail('id')->get();
 //        if($this->validateTime(Input::get('start_time')) && $this->validateTime(Input::get('end_time')) ){
-            $this->postAddTime($timeEntry);
 
-            try{
-                $timeEntry->save();
-//                return Response::json(array('status' => 200 , 'message' => 'time was saved '), 200);
-                return Redirect::back()->with('message', 'Time Entry Changed')->with('alert', 'success');
-            }catch (exception $e){
-
-                return Redirect::back()->with('message', 'Time Change Failed')->with('alert', 'danger');
-//                return Response::json(array('status' => 401, 'message' => 'time was not saved ', 'error' => $e),401);
-// endif            }
+        if ($timeEntry['user_id'] != Auth::user()->id) {
+          return Response::json(array('status' => 401, 'message' => 'You can only delete your own Entrys'), 401);
         }
 
+        $timeEntry->category_id = Input::get('modify_category_id');
+        $timeEntry->startTime = Input::get('modify_start_time');
+        $timeEntry->startDate = Input::get('modify_start_date');
+        $timeEntry->endDate = Input::get('modify_end_date');
+        $timeEntry->endTime   = Input::get('modify_end_time');
+        $timeEntry->description = Input::get('description');
+        $timeEntry->pay_id = Input::get('pay_id');       
+
+        if (Input::get('modify_clock_in') == "yes") {
+          $timeEntry->clocked_in = "1";
+        } else {
+          $timeEntry->clocked_in = "0";
+        }
+
+        try{
+            $timeEntry->save();
+            return Redirect::back()->with('message', 'Time Entry Changed')->with('alert', 'success');
+        }catch (exception $e){
+            return Redirect::back()->with('message', 'Time Change Failed')->with('alert', 'danger');
+        }
     }
     /*
     Alternet version of the modiy time.
@@ -185,7 +182,11 @@ class TimeTrackingController extends  BaseController{
         $timeEntry->endTime   = Input::get('end_time');
         $timeEntry->description = Input::get('description');
         $timeEntry->pay_id = Input::get('pay_id');
-
+        if (Input::get('clock_in') == "yes") {
+          $timeEntry->clocked_in = "1";
+        } else {
+          $timeEntry->clocked_in = "0";
+        }
     }
     /**
      * This is a simple time validation to make sure the time is

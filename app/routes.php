@@ -38,6 +38,7 @@ Route::group(array('before' => 'auth'), function() use($layout){
 			Route::group(array('prefix' => 'time/'), function() use($layout) {
 				Route::post('createPayPeriod', 'TimeTracking\controllers\TimeTrackingPayPeriodController@postCreatePayPeriod');
 				Route::controller('categories', 'TimeTracking\controllers\TimeTrackingCategories');
+				Route::get('viewpay/{id}', 'TimeTracking\controllers\TimeTrackingPayPeriodController@getViewPay');
 			});
 
 
